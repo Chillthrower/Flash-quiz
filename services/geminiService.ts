@@ -68,8 +68,8 @@ export const parsePDFsToQuiz = async (files: File[]): Promise<ProcessedQuiz> => 
   };
 
   try {
-    // We use the flash-lite model as requested for low-latency responses
-    const modelId = "gemini-flash-lite-latest"; 
+    // Upgraded to gemini-2.5-flash for better reasoning capabilities when answer keys are missing
+    const modelId = "gemini-2.5-flash"; 
     
     const response = await ai.models.generateContent({
       model: modelId,
@@ -84,8 +84,11 @@ export const parsePDFsToQuiz = async (files: File[]): Promise<ProcessedQuiz> => 
             Rules:
             1. Extract the question text clearly.
             2. Extract exactly 4 options for each question.
-            3. Identify the correct answer. If the document provides an answer key, use it. If not, solve the question yourself to find the correct answer.
-            4. Provide a short explanation for the correct answer.
+            3. Identify the correct answer. 
+               - CRITICAL: Check if the document provides an answer key or marked answers.
+               - If an answer key is present, use it to determine the correct answer.
+               - If NO answer key is present, you MUST solve the question yourself acting as a subject matter expert. 
+            4. Provide a short explanation for the correct answer, especially if you had to solve it yourself.
             5. Return the output in strict JSON format matching the schema.`
           }
         ]
@@ -93,7 +96,7 @@ export const parsePDFsToQuiz = async (files: File[]): Promise<ProcessedQuiz> => 
       config: {
         responseMimeType: "application/json",
         responseSchema: schema,
-        systemInstruction: "You are an intelligent educational assistant helping to convert PDF exam papers into interactive digital quizzes.",
+        systemInstruction: "You are an expert educational assistant. Your task is to convert PDF exam papers into interactive quizzes. You have deep knowledge in all academic subjects and can solve undefined questions accurately.",
         temperature: 0.2, // Low temperature for more deterministic extraction
       }
     });
