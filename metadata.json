@@ -1,0 +1,5 @@
+{
+  "name": "FlashQuiz PDF Parser",
+  "description": "Upload MCQ PDFs and instantly turn them into interactive quizzes using Gemini 2.5 Flash Lite.",
+  "requestFramePermissions": []
+}
